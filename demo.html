@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wenstech HMS - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .dashboard-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .patient-avatar {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 50;
+                height: 100vh;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 40;
+            }
+            .overlay.open {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Mobile overlay -->
+        <div class="overlay" id="overlay"></div>
+
+        <!-- Sidebar -->
+        <div class="sidebar bg-[#755100] text-white w-64 flex-shrink-0" id="sidebar">
+            <div class="flex items-center justify-between p-4 border-b border-[#664900]">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-white rounded-md flex items-center justify-center mr-2">
+                        <span class="text-[#755100] font-bold text-sm">W</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold leading-tight text-sm">Wenstech</span>
+                        <span class="text-[10px] text-gray-300 leading-tight">HOSPITAL SYSTEM</span>
+                    </div>
+                </div>
+                <button class="lg:hidden text-white" id="close-sidebar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="p-4">
+                <div class="mb-6">
+                    <div class="text-xs uppercase text-gray-300 mb-2 px-2">Main Menu</div>
+                    <nav>
+                        <a href="demo.html" class="flex items-center px-2 py-2 text-white bg-[#664900] rounded-md mb-1">
+    <i class="fas fa-tachometer-alt mr-3"></i>
+    <span>Dashboard</span>
+</a>
+
+                        <a href="#" data-section="patients" class="nav-link flex items-center px-2 py-2 text-gray-200 hover:text-white hover:bg-[#664900] rounded-md mb-1">
+                            <i class="fas fa-user-injured mr-3"></i>
+                            <span>Patients</span>
+                        </a>
+                        <a href="#" data-section="appointments" class="nav-link flex items-center px-2 py-2 text-gray-200 hover:text-white hover:bg-[#664900] rounded-md mb-1">
+                            <i class="fas fa-calendar-check mr-3"></i>
+                            <span>Appointments</span>
+                        </a>
+                        <a href="#" data-section="pharmacy" class="nav-link flex items-center px-2 py-2 text-gray-200 hover:text-white hover:bg-[#664900] rounded-md mb-1">
+                            <i class="fas fa-pills mr-3"></i>
+                            <span>Pharmacy</span>
+                        </a>
+                        <a href="#" data-section="laboratory" class="nav-link flex items-center px-2 py-2 text-gray-200 hover:text-white hover:bg-[#664900] rounded-md mb-1">
+                            <i class="fas fa-flask mr-3"></i>
+                            <span>Laboratory</span>
+                        </a>
+                        <a href="#" data-section="billing" class="nav-link flex items-center px-2 py-2 text-gray-200 hover:text-white hover:bg-[#664900] rounded-md mb-1">
+                            <i class="fas fa-file-invoice-dollar mr-3"></i>
+                            <span>Billing</span>
+                        </a>
+                    </nav>
+                </div>
+                
+                <div class="mb-6">
+                    <div class="text-xs uppercase text-gray-300 mb-2 px-2">Administration</div>
+                    <nav>
+                        <a href="#" data-section="doctors" class="nav-link flex items-center px-2 py-2 text-gray-200 hover:text-white hover:bg-[#664900] rounded-md mb-1">
+                            <i class="fas fa-user-md mr-3"></i>
+                            <span>Doctors</span>
+                        </a>
+                        <a href="#" data-section="staff" class="nav-link flex items-center px-2 py-2 text-gray-200 hover:text-white hover:bg-[#664900] rounded-md mb-1">
+                            <i class="fas fa-user-nurse mr-3"></i>
+                            <span>Staff</span>
+                        </a>
+                        <a href="#" data-section="ward-management" class="nav-link flex items-center px-2 py-2 text-gray-200 hover:text-white hover:bg-[#664900] rounded-md mb-1">
+                            <i class="fas fa-bed mr-3"></i>
+                            <span>Ward Management</span>
+                        </a>
+                        <a href="#" data-section="settings" class="nav-link flex items-center px-2 py-2 text-gray-200 hover:text-white hover:bg-[#664900] rounded-md mb-1">
+                            <i class="fas fa-cog mr-3"></i>
+                            <span>Settings</span>
+                        </a>
+                    </nav>
+                </div>
+                
+                <div class="mb-6">
+                    <div class="text-xs uppercase text-gray-300 mb-2 px-2">Reports</div>
+                    <nav>
+                        <a href="#" data-section="analytics" class="nav-link flex items-center px-2 py-2 text-gray-200 hover:text-white hover:bg-[#664900] rounded-md mb-1">
+                            <i class="fas fa-chart-line mr-3"></i>
+                            <span>Analytics</span>
+                        </a>
+                        <a href="#" data-section="medical-reports" class="nav-link flex items-center px-2 py-2 text-gray-200 hover:text-white hover:bg-[#664900] rounded-md mb-1">
+                            <i class="fas fa-file-medical mr-3"></i>
+                            <span>Medical Reports</span>
+                        </a>
+                        <a href="#" data-section="financial-reports" class="nav-link flex items-center px-2 py-2 text-gray-200 hover:text-white hover:bg-[#664900] rounded-md mb-1">
+                            <i class="fas fa-file-invoice mr-3"></i>
+                            <span>Financial Reports</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top header -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between px-4 py-3">
+                    <div class="flex items-center">
+                        <button class="lg:hidden text-gray-600 mr-4" id="open-sidebar">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h1 class="text-xl font-bold text-gray-800" id="page-title">Dashboard</h1>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button class="text-gray-600 hover:text-gray-900">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <button class="text-gray-600 hover:text-gray-900">
+                                <i class="fas fa-envelope"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-blue-500"></span>
+                            </button>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="mr-3 text-right hidden md:block">
+                                <div class="text-sm font-medium text-gray-800">Dr. Jane Doe</div>
+                                <div class="text-xs text-gray-500">Administrator</div>
+                            </div>
+                            <div class="relative">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-8 h-8 rounded-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main content area -->
+            <main class="flex-1 overflow-y-auto p-4 bg-gray-50" id="main-content">
+                <!-- Dashboard Content -->
+                <div id="dashboard-content">
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                                    <i class="fas fa-user-injured text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="text-gray-500 text-sm">Total Patients</div>
+                                    <div class="text-2xl font-bold" id="total-patients">0</div>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-sm text-blue-600 flex items-center">
+                                <i class="fas fa-arrow-up mr-1"></i>
+                                <span id="patients-change">0</span>% from last month
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                                    <i class="fas fa-calendar-check text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="text-gray-500 text-sm">Today's Appointments</div>
+                                    <div class="text-2xl font-bold" id="total-appointments">0</div>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-sm text-green-600 flex items-center">
+                                <i class="fas fa-arrow-up mr-1"></i>
+                                <span id="appointments-change">0</span>% from yesterday
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                                    <i class="fas fa-procedures text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="text-gray-500 text-sm">Admitted Patients</div>
+                                    <div class="text-2xl font-bold" id="total-admitted">0</div>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-sm text-purple-600 flex items-center">
+                                <i class="fas fa-bed mr-1"></i>
+                                <span id="available-beds">0</span> beds available
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                                    <i class="fas fa-file-invoice-dollar text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="text-gray-500 text-sm">Today's Revenue</div>
+                                    <div class="text-2xl font-bold" id="today-revenue">KES 0</div>
+                                </div>
+                            </div>
+                            <div class="mt-3 text-sm text-yellow-600 flex items-center">
+                                <i class="fas fa-arrow-up mr-1"></i>
+                                <span id="revenue-change">0</span>% from yesterday
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts and Tables Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <!-- Patient Chart -->
+                        <div class="lg:col-span-2 dashboard-card bg-white rounded-lg shadow p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-lg font-semibold text-gray-800">Patient Statistics</h2>
+                                <div class="flex">
+                                    <button class="px-3 py-1 text-xs bg-[#755100] text-white rounded-l-md">Monthly</button>
+                                    <button class="px-3 py-1 text-xs bg-gray-200 text-gray-700">Weekly</button>
+                                    <button class="px-3 py-1 text-xs bg-gray-200 text-gray-700 rounded-r-md">Daily</button>
+                                </div>
+                            </div>
+                            <div class="h-64" id="patient-chart">
+                                <!-- Chart placeholder -->
+                                <div class="flex items-center justify-center h-full text-gray-400">
+                                    <div class="text-center">
+                                        <i class="fas fa-chart-bar text-4xl mb-2"></i>
+                                        <p>Patient data chart will appear here</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Patients -->
+                        <div class="dashboard-card bg-white rounded-lg shadow overflow-hidden">
+                            <div class="p-4 border-b">
+                                <h2 class="text-lg font-semibold text-gray-800">Recent Patients</h2>
+                            </div>
+                            <div class="divide-y" id="recent-patients">
+                                <div class="flex items-center justify-center p-8 text-gray-400">
+                                    <div class="text-center">
+                                        <i class="fas fa-user-injured text-4xl mb-2"></i>
+                                        <p>No recent patients found</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-gray-50 text-center">
+                                <a href="#" data-section="patients" class="nav-link text-sm text-[#755100] font-medium">View All Patients</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Appointments and Tasks Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Today's Appointments -->
+                        <div class="dashboard-card bg-white rounded-lg shadow overflow-hidden">
+                            <div class="p-4 border-b">
+                                <div class="flex items-center justify-between">
+                                    <h2 class="text-lg font-semibold text-gray-800">Today's Appointments</h2>
+                                    <button class="text-sm text-[#755100] font-medium" id="add-appointment">+ Add New</button>
+                                </div>
+                            </div>
+                            <div class="divide-y" id="todays-appointments">
+                                <div class="flex items-center justify-center p-8 text-gray-400">
+                                    <div class="text-center">
+                                        <i class="fas fa-calendar-check text-4xl mb-2"></i>
+                                        <p>No appointments today</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-gray-50 text-center">
+                                <a href="#" data-section="appointments" class="nav-link text-sm text-[#755100] font-medium">View All Appointments</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="p-3 bg-blue-50 text-blue-600 rounded-lg flex flex-col items-center justify-center hover:bg-blue-100 transition" id="quick-new-patient">
+                                    <i class="fas fa-user-plus text-xl mb-2"></i>
+                                    <span class="text-sm">New Patient</span>
+                                </button>
+                                <button class="p-3 bg-green-50 text-green-600 rounded-lg flex flex-col items-center justify-center hover:bg-green-100 transition" id="quick-new-appointment">
+                                    <i class="fas fa-calendar-plus text-xl mb-2"></i>
+                                    <span class="text-sm">New Appointment</span>
+                                </button>
+                                <button class="p-3 bg-purple-50 text-purple-600 rounded-lg flex flex-col items-center justify-center hover:bg-purple-100 transition">
+                                    <i class="fas fa-pills text-xl mb-2"></i>
+                                    <span class="text-sm">Pharmacy</span>
+                                </button>
+                                <button class="p-3 bg-yellow-50 text-yellow-600 rounded-lg flex flex-col items-center justify-center hover:bg-yellow-100 transition">
+                                    <i class="fas fa-flask text-xl mb-2"></i>
+                                    <span class="text-sm">Lab Test</span>
+                                </button>
+                                <button class="p-3 bg-red-50 text-red-600 rounded-lg flex flex-col items-center justify-center hover:bg-red-100 transition">
+                                    <i class="fas fa-file-invoice text-xl mb-2"></i>
+                                    <span class="text-sm">Generate Bill</span>
+                                </button>
+                                <button class="p-3 bg-indigo-50 text-indigo-600 rounded-lg flex flex-col items-center justify-center hover:bg-indigo-100 transition">
+                                    <i class="fas fa-file-medical text-xl mb-2"></i>
+                                    <span class="text-sm">Medical Report</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Activities -->
+                        <div class="dashboard-card bg-white rounded-lg shadow overflow-hidden">
+                            <div class="p-4 border-b">
+                                <h2 class="text-lg font-semibold text-gray-800">Recent Activities</h2>
+                            </div>
+                            <div class="divide-y" id="recent-activities">
+                                <div class="p-4">
+                                    <div class="flex items-start">
+                                        <div class="p-2 bg-blue-100 text-blue-600 rounded-full mr-3">
+                                            <i class="fas fa-user-md"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium">Dr. Smith added a new diagnosis</p>
+                                            <p class="text-xs text-gray-500">2 minutes ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-start">
+                                        <div class="p-2 bg-green-100 text-green-600 rounded-full mr-3">
+                                            <i class="fas fa-user-injured"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium">New patient registered</p>
+                                            <p class="text-xs text-gray-500">15 minutes ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-start">
+                                        <div class="p-2 bg-purple-100 text-purple-600 rounded-full mr-3">
+                                            <i class="fas fa-pills"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium">Prescription filled in pharmacy</p>
+                                            <p class="text-xs text-gray-500">1 hour ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-start">
+                                        <div class="p-2 bg-yellow-100 text-yellow-600 rounded-full mr-3">
+                                            <i class="fas fa-flask"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium">Lab test results uploaded</p>
+                                            <p class="text-xs text-gray-500">2 hours ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-gray-50 text-center">
+                                <a href="#" class="text-sm text-[#755100] font-medium">View All Activities</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add Appointment Modal -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="appointment-modal">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">Add New Appointment</h3>
+                <button class="text-gray-500 hover:text-gray-700" id="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Patient</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#755100] focus:border-transparent" id="patient-select">
+                        <option value="">Select Patient</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Doctor</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#755100] focus:border-transparent" id="doctor-select">
+                        <option value="">Select Doctor</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Date & Time</label>
+                    <input type="datetime-local" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#755100] focus:border-transparent" id="appointment-time">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Reason</label>
+                    <textarea class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#755100] focus:border-transparent" id="appointment-reason" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="p-4 border-t flex justify-end space-x-3">
+                <button class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300" id="cancel-appointment">Cancel</button>
+                <button class="px-4 py-2 text-white bg-[#755100] rounded-md hover:bg-[#664900]" id="save-appointment">Save Appointment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Patient Modal -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" id="patient-modal">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="p-4 border-b flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">Add New Patient</h3>
+                <button class="text-gray-500 hover:text-gray-700" id="close-patient-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Full Name</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#755100] focus:border-transparent" id="patient-name">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Gender</label>
+                    <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#755100] focus:border-transparent" id="patient-gender">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Age</label>
+                    <input type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#755100] focus:border-transparent" id="patient-age">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Phone</label>
+                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#755100] focus:border-transparent" id="patient-phone">
+                </div>
+            </div>
+            <div class="p-4 border-t flex justify-end space-x-3">
+                <button class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300" id="cancel-patient">Cancel</button>
+                <button class="px-4 py-2 text-white bg-[#755100] rounded-md hover:bg-[#664900]" id="save-patient">Save Patient</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize localStorage data if not exists
+        if (!localStorage.getItem('hospitalData')) {
+            const initialData = {
+                patients: [
+                    {
+                        id: 1,
+                        name: "Kevin Kimani",
+                        gender: "Male",
+                        age: 35,
+                        phone: "254712345678",
+                        lastVisit: "2025-06-15",
+                        status: "Active",
+                        avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+                    },
+                    {
+                        id: 2,
+                        name: "Mercy Johnson",
+                        gender: "Female",
+                        age: 28,
+                        phone: "254723456789",
+                        lastVisit: "2025-06-14",
+                        status: "Active",
+                        avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+                    },
+                    {
+                        id: 3,
+                        name: "Robert Kirwa",
+                        gender: "Male",
+                        age: 52,
+                        phone: "254734567890",
+                        lastVisit: "2025-06-10",
+                        status: "Active",
+                        avatar: "https://randomuser.me/api/portraits/men/67.jpg"
+                    },
+                    {
+                        id: 4,
+                        name: "Emily Davis",
+                        gender: "Female",
+                        age: 42,
+                        phone: "254745678901",
+                        lastVisit: "2025-06-08",
+                        status: "Active",
+                        avatar: "https://randomuser.me/api/portraits/women/63.jpg"
+                    }
+                ],
+                appointments: [
+                    {
+                        id: 1,
+                        patientId: 1,
+                        patientName: "Kevin Kimani",
+                        doctorId: 1,
+                        doctorName: "Dr. Jane Doe",
+                        time: "2025-06-16T10:00",
+                        reason: "Follow-up consultation",
+                        status: "Scheduled"
+                    },
+                    {
+                        id: 2,
+                        patientId: 2,
+                        patientName: "Mercy Johnson",
+                        doctorId: 2,
+                        doctorName: "Dr. John Smith",
+                        time: "2025-06-16T11:30",
+                        reason: "Annual checkup",
+                        status: "Scheduled"
+                    }
+                ],
+                drugs: [
+                    { id: 1, name: "Paracetamol", quantity: 500, unit: "Tablets", expiry: "2026-12-31" },
+                    { id: 2, name: "Amoxicillin", quantity: 200, unit: "Capsules", expiry: "2026-06-30" }
+                ],
+                labTests: [
+                    { id: 1, patientId: 1, patientName: "Kevin Kimani", testName: "Blood Count", result: "Normal", date: "2025-06-15" },
+                    { id: 2, patientId: 2, patientName: "Mercy Johnson", testName: "Urinalysis", result: "Normal", date: "2025-06-14" }
+                ],
+                invoices: [
+                    { id: 1, patientId: 1, patientName: "Kevin Kimani", amount: 5000, status: "Paid", date: "2025-06-15" },
+                    { id: 2, patientId: 2, patientName: "Mercy Johnson", amount: 3500, status: "Pending", date: "2025-06-14" }
+                ],
+                doctors: [
+                    { id: 1, name: "Dr. Jane Doe", specialty: "Cardiology", phone: "254756789012" },
+                    { id: 2, name: "Dr. John Smith", specialty: "Pediatrics", phone: "254767890123" },
+                    { id: 3, name: "Dr. Sarah Johnson", specialty: "Neurology", phone: "254778901234" }
+                ],
+                staff: [
+                    { id: 1, name: "Mary Wangari", role: "Nurse", phone: "254789012345" },
+                    { id: 2, name: "Peter Kamau", role: "Receptionist", phone: "254790123456" }
+                ],
+                wards: [
+                    { id: 1, name: "General Ward", totalBeds: 20, occupiedBeds: 15 },
+                    { id: 2, name: "Maternity Ward", totalBeds: 10, occupiedBeds: 8 }
+                ],
+                settings: {
+                    hospitalName: "Wenstech Medical Center",
+                    location: "Nairobi, Kenya",
+                    currency: "KES"
+                },
+                medicalReports: [
+                    { id: 1, patientId: 1, patientName: "Kevin Kimani", report: "Cardiac evaluation normal", date: "2025-06-15" },
+                    { id: 2, patientId: 2, patientName: "Mercy Johnson", report: "Pediatric checkup normal", date: "2025-06-14" }
+                ],
+                stats: {
+                    totalPatients: 1245,
+                    patientsChange: 5.2,
+                    totalAppointments: 18,
+                    appointmentsChange: 12.5,
+                    totalAdmitted: 24,
+                    availableBeds: 36,
+                    todayRevenue: 284500,
+                    revenueChange: 8.3
+                }
+            };
+            localStorage.setItem('hospitalData', JSON.stringify(initialData));
+        }
+
+        // Load data from localStorage
+        let hospitalData = JSON.parse(localStorage.getItem('hospitalData'));
+
+        // DOM elements
+        const sidebar = document.getElementById('sidebar');
+        const openSidebar = document.getElementById('open-sidebar');
+        const closeSidebar = document.getElementById('close-sidebar');
+        const overlay = document.getElementById('overlay');
+        const mainContent = document.getElementById('main-content');
+        const pageTitle = document.getElementById('page-title');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const appointmentModal = document.getElementById('appointment-modal');
+        const addAppointmentBtn = document.getElementById('add-appointment');
+        const closeModalBtn = document.getElementById('close-modal');
+        const cancelAppointmentBtn = document.getElementById('cancel-appointment');
+        const saveAppointmentBtn = document.getElementById('save-appointment');
+        const patientSelect = document.getElementById('patient-select');
+        const doctorSelect = document.getElementById('doctor-select');
+        const patientModal = document.getElementById('patient-modal');
+        const closePatientModalBtn = document.getElementById('close-patient-modal');
+        const cancelPatientBtn = document.getElementById('cancel-patient');
+        const savePatientBtn = document.getElementById('save-patient');
+        const quickNewPatientBtn = document.getElementById('quick-new-patient');
+        const quickNewAppointmentBtn = document.getElementById('quick-new-appointment');
+
+        // Section content templates
+        const sectionTemplates = {
+            dashboard: () => document.getElementById('dashboard-content').innerHTML,
+            patients: () => `
+                <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800">Patients</h2>
+                        <button class="text-sm text-[#755100] font-medium" id="add-patient">+ Add New</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-gray-500 text-sm">
+                                    <th class="p-3">Name</th>
+                                    <th class="p-3">Gender</th>
+                                    <th class="p-3">Age</th>
+                                    <th class="p-3">Phone</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="patients-table" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            `,
+            appointments: () => `
+                <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800">Appointments</h2>
+                        <button class="text-sm text-[#755100] font-medium" id="add-appointment">+ Add New</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-gray-500 text-sm">
+                                    <th class="p-3">Patient</th>
+                                    <th class="p-3">Doctor</th>
+                                    <th class="p-3">Time</th>
+                                    <th class="p-3">Reason</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointments-table" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            `,
+            pharmacy: () => `
+                <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800">Pharmacy Inventory</h2>
+                        <button class="text-sm text-[#755100] font-medium" id="add-drug">+ Add New</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-gray-500 text-sm">
+                                    <th class="p-3">Drug Name</th>
+                                    <th class="p-3">Quantity</th>
+                                    <th class="p-3">Unit</th>
+                                    <th class="p-3">Expiry</th>
+                                    <th class="p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="drugs-table" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            `,
+            laboratory: () => `
+                <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800">Laboratory Tests</h2>
+                        <button class="text-sm text-[#755100] font-medium" id="add-test">+ Add New</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-gray-500 text-sm">
+                                    <th class="p-3">Patient</th>
+                                    <th class="p-3">Test Name</th>
+                                    <th class="p-3">Result</th>
+                                    <th class="p-3">Date</th>
+                                    <th class="p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tests-table" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            `,
+            billing: () => `
+                <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800">Invoices</h2>
+                        <button class="text-sm text-[#755100] font-medium" id="add-invoice">+ Add New</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-gray-500 text-sm">
+                                    <th class="p-3">Patient</th>
+                                    <th class="p-3">Amount (KES)</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Date</th>
+                                    <th class="p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoices-table" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            `,
+            doctors: () => `
+                <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800">Doctors</h2>
+                        <button class="text-sm text-[#755100] font-medium" id="add-doctor">+ Add New</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-gray-500 text-sm">
+                                    <th class="p-3">Name</th>
+                                    <th class="p-3">Specialty</th>
+                                    <th class="p-3">Phone</th>
+                                    <th class="p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doctors-table" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            `,
+            staff: () => `
+                <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800">Staff</h2>
+                        <button class="text-sm text-[#755100] font-medium" id="add-staff">+ Add New</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-gray-500 text-sm">
+                                    <th class="p-3">Name</th>
+                                    <th class="p-3">Role</th>
+                                    <th class="p-3">Phone</th>
+                                    <th class="p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staff-table" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            `,
+            'ward-management': () => `
+                <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800">Ward Management</h2>
+                        <button class="text-sm text-[#755100] font-medium" id="add-ward">+ Add New</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-gray-500 text-sm">
+                                    <th class="p-3">Ward Name</th>
+                                    <th class="p-3">Total Beds</th>
+                                    <th class="p-3">Occupied Beds</th>
+                                    <th class="p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wards-table" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            `,
+            settings: () => `
+                <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4">System Settings</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-medium mb-2">Hospital Name</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#755100] focus:border-transparent" id="hospital-name" value="${hospitalData.settings.hospitalName}">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-medium mb-2">Location</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#755100] focus:border-transparent" id="hospital-location" value="${hospitalData.settings.location}">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-medium mb-2">Currency</label>
+                            <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#755100] focus:border-transparent" id="hospital-currency" value="${hospitalData.settings.currency}" readonly>
+                        </div>
+                        <div class="flex justify-end">
+                            <button class="px-4 py-2 text-white bg-[#755100] rounded-md hover:bg-[#664900]" id="save-settings">Save Settings</button>
+                        </div>
+                    </div>
+                </div>
+            `,
+            analytics: () => `
+                <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Analytics</h2>
+                    <div class="h-64 flex items-center justify-center text-gray-400">
+                        <div class="text-center">
+                            <i class="fas fa-chart-line text-4xl mb-2"></i>
+                            <p>Analytics dashboard will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'medical-reports': () => `
+                <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800">Medical Reports</h2>
+                        <button class="text-sm text-[#755100] font-medium" id="add-report">+ Add New</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-gray-500 text-sm">
+                                    <th class="p-3">Patient</th>
+                                    <th class="p-3">Report</th>
+                                    <th class="p-3">Date</th>
+                                    <th class="p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reports-table" class="divide-y"></tbody>
+                        </table>
+                    </div>
+                </div>
+            `,
+            'financial-reports': () => `
+                <div class="dashboard-card bg-white rounded-lg shadow p-4">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Financial Reports</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-sm text-gray-600">Total Revenue (This Month): <span class="font-medium">KES ${hospitalData.stats.todayRevenue * 30}</span></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Pending Payments: <span class="font-medium">KES ${hospitalData.invoices.reduce((sum, inv) => inv.status === 'Pending' ? sum + inv.amount : sum, 0)}</span></p>
+                        </div>
+                        <div class="h-64 flex items-center justify-center text-gray-400">
+                            <div class="text-center">
+                                <i class="fas fa-chart-pie text-4xl mb-2"></i>
+                                <p>Financial charts will appear here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        // Toggle sidebar on mobile
+        openSidebar.addEventListener('click', () => {
+            sidebar.classList.add('open');
+            overlay.classList.add('open');
+        });
+
+        closeSidebar.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+        });
+
+        // Appointment modal
+        addAppointmentBtn.addEventListener('click', () => {
+            appointmentModal.classList.remove('hidden');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            appointmentModal.classList.add('hidden');
+        });
+
+        cancelAppointmentBtn.addEventListener('click', () => {
+            appointmentModal.classList.add('hidden');
+        });
+
+        // Patient modal
+        quickNewPatientBtn.addEventListener('click', () => {
+            patientModal.classList.remove('hidden');
+        });
+
+        quickNewAppointmentBtn.addEventListener('click', () => {
+            appointmentModal.classList.remove('hidden');
+        });
+
+        closePatientModalBtn.addEventListener('click', () => {
+            patientModal.classList.add('hidden');
+        });
+
+        cancelPatientBtn.addEventListener('click', () => {
+            patientModal.classList.add('hidden');
+        });
+
+        // Populate patient and doctor selects
+        function populateSelects() {
+            patientSelect.innerHTML = '<option value="">Select Patient</option>';
+            hospitalData.patients.forEach(patient => {
+                const option = document.createElement('option');
+                option.value = patient.id;
+                option.textContent = `${patient.name} (${patient.gender}, ${patient.age})`;
+                patientSelect.appendChild(option);
+            });
+
+            doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+            hospitalData.doctors.forEach(doctor => {
+                const option = document.createElement('option');
+                option.value = doctor.id;
+                option.textContent = `${doctor.name} (${doctor.specialty})`;
+                doctorSelect.appendChild(option);
+            });
+        }
+
+        // Save new appointment
+        saveAppointmentBtn.addEventListener('click', () => {
+            const patientId = patientSelect.value;
+            const doctorId = doctorSelect.value;
+            const time = document.getElementById('appointment-time').value;
+            const reason = document.getElementById('appointment-reason').value;
+
+            if (!patientId || !doctorId || !time) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const patient = hospitalData.patients.find(p => p.id == patientId);
+            const doctor = hospitalData.doctors.find(d => d.id == doctorId);
+            
+            const newAppointment = {
+                id: hospitalData.appointments.length + 1,
+                patientId: patientId,
+                patientName: patient.name,
+                doctorId: doctorId,
+                doctorName: doctor.name,
+                time: time,
+                reason: reason,
+                status: "Scheduled"
+            };
+
+            hospitalData.appointments.push(newAppointment);
+            hospitalData.stats.totalAppointments += 1;
+            
+            localStorage.setItem('hospitalData', JSON.stringify(hospitalData));
+            appointmentModal.classList.add('hidden');
+            if (currentSection === 'dashboard') loadDashboardData();
+            else if (currentSection === 'appointments') loadAppointments();
+        });
+
+        // Save new patient
+        savePatientBtn.addEventListener('click', () => {
+            const name = document.getElementById('patient-name').value;
+            const gender = document.getElementById('patient-gender').value;
+            const age = document.getElementById('patient-age').value;
+            const phone = document.getElementById('patient-phone').value;
+
+            if (!name || !gender || !age || !phone) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const newPatient = {
+                id: hospitalData.patients.length + 1,
+                name,
+                gender,
+                age: parseInt(age),
+                phone,
+                lastVisit: new Date().toISOString().split('T')[0],
+                status: "Active",
+                avatar: `https://randomuser.me/api/portraits/${gender.toLowerCase()}/${Math.floor(Math.random() * 100)}.jpg`
+            };
+
+            hospitalData.patients.push(newPatient);
+            hospitalData.stats.totalPatients += 1;
+            
+            localStorage.setItem('hospitalData', JSON.stringify(hospitalData));
+            patientModal.classList.add('hidden');
+            if (currentSection === 'dashboard') loadDashboardData();
+            else if (currentSection === 'patients') loadPatients();
+            populateSelects();
+        });
+
+        // Update stats
+        function updateStats() {
+            document.getElementById('total-patients').textContent = hospitalData.stats.totalPatients;
+            document.getElementById('patients-change').textContent = hospitalData.stats.patientsChange;
+            document.getElementById('total-appointments').textContent = hospitalData.stats.totalAppointments;
+            document.getElementById('appointments-change').textContent = hospitalData.stats.appointmentsChange;
+            document.getElementById('total-admitted').textContent = hospitalData.stats.totalAdmitted;
+            document.getElementById('available-beds').textContent = hospitalData.stats.availableBeds;
+            document.getElementById('today-revenue').textContent = `KES ${hospitalData.stats.todayRevenue.toLocaleString()}`;
+            document.getElementById('revenue-change').textContent = hospitalData.stats.revenueChange;
+        }
+
+        // Load recent patients
+        function loadRecentPatients() {
+            const container = document.getElementById('recent-patients');
+            container.innerHTML = '';
+
+            hospitalData.patients.slice(0, 5).forEach(patient => {
+                const patientEl = document.createElement('div');
+                patientEl.className = 'p-4 flex items-center';
+                patientEl.innerHTML = `
+                    <img src="${patient.avatar}" alt="${patient.name}" class="patient-avatar rounded-full mr-3">
+                    <div class="flex-1">
+                        <div class="font-medium">${patient.name}</div>
+                        <div class="text-sm text-gray-500">${patient.gender}, ${patient.age} years</div>
+                    </div>
+                    <div class="text-xs px-2 py-1 bg-${patient.status === 'Active' ? 'green' : 'gray'}-100 text-${patient.status === 'Active' ? 'green' : 'gray'}-600 rounded-full">${patient.status}</div>
+                `;
+                container.appendChild(patientEl);
+            });
+        }
+
+        // Load today's appointments
+        function loadTodaysAppointments() {
+            const container = document.getElementById('todays-appointments');
+            container.innerHTML = '';
+
+            const today = new Date().toISOString().split('T')[0];
+            const todaysAppointments = hospitalData.appointments.filter(apt => apt.time.startsWith(today));
+
+            if (todaysAppointments.length === 0) {
+                container.innerHTML = `
+                    <div class="flex items-center justify-center p-8 text-gray-400">
+                        <div class="text-center">
+                            <i class="fas fa-calendar-check text-4xl mb-2"></i>
+                            <p>No appointments today</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            todaysAppointments.forEach(apt => {
+                const aptEl = document.createElement('div');
+                aptEl.className = 'p-4 flex items-start';
+                aptEl.innerHTML = `
+                    <div class="p-2 bg-blue-100 text-blue-600 rounded-full mr-3">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="font-medium">${apt.patientName}</div>
+                        <div class="text-sm text-gray-500">${new Date(apt.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} • ${apt.doctorName}</div>
+                        <div class="text-sm mt-1 text-gray-600">${apt.reason}</div>
+                    </div>
+                    <div class="text-xs px-2 py-1 bg-${apt.status === 'Scheduled' ? 'green' : 'gray'}-100 text-${apt.status === 'Scheduled' ? 'green' : 'gray'}-600 rounded-full">${apt.status}</div>
+                `;
+                container.appendChild(aptEl);
+            });
+        }
+
+        // Load patients
+        function loadPatients() {
+            const container = document.getElementById('patients-table');
+            if (!container) return;
+            container.innerHTML = '';
+
+            hospitalData.patients.forEach(patient => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-3">${patient.name}</td>
+                    <td class="p-3">${patient.gender}</td>
+                    <td class="p-3">${patient.age}</td>
+                    <td class="p-3">${patient.phone}</td>
+                    <td class="p-3">
+                        <span class="text-xs px-2 py-1 bg-${patient.status === 'Active' ? 'green' : 'gray'}-100 text-${patient.status === 'Active' ? 'green' : 'gray'}-600 rounded-full">${patient.status}</span>
+                    </td>
+                    <td class="p-3">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-eye"></i></button>
+                        <button class="text-yellow-600 hover:text-yellow-800"><i class="fas fa-edit"></i></button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+
+            document.getElementById('add-patient').addEventListener('click', () => {
+                patientModal.classList.remove('hidden');
+            });
+        }
+
+        // Load appointments
+        function loadAppointments() {
+            const container = document.getElementById('appointments-table');
+            if (!container) return;
+            container.innerHTML = '';
+
+            hospitalData.appointments.forEach(apt => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-3">${apt.patientName}</td>
+                    <td class="p-3">${apt.doctorName}</td>
+                    <td class="p-3">${new Date(apt.time).toLocaleString()}</td>
+                    <td class="p-3">${apt.reason}</td>
+                    <td class="p-3">
+                        <span class="text-xs px-2 py-1 bg-${apt.status === 'Scheduled' ? 'green' : 'gray'}-100 text-${apt.status === 'Scheduled' ? 'green' : 'gray'}-600 rounded-full">${apt.status}</span>
+                    </td>
+                    <td class="p-3">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-eye"></i></button>
+                        <button class="text-yellow-600 hover:text-yellow-800"><i class="fas fa-edit"></i></button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+
+            document.getElementById('add-appointment').addEventListener('click', () => {
+                appointmentModal.classList.remove('hidden');
+            });
+        }
+
+        // Load pharmacy
+        function loadPharmacy() {
+            const container = document.getElementById('drugs-table');
+            if (!container) return;
+            container.innerHTML = '';
+
+            hospitalData.drugs.forEach(drug => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-3">${drug.name}</td>
+                    <td class="p-3">${drug.quantity}</td>
+                    <td class="p-3">${drug.unit}</td>
+                    <td class="p-3">${drug.expiry}</td>
+                    <td class="p-3">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-eye"></i></button>
+                        <button class="text-yellow-600 hover:text-yellow-800"><i class="fas fa-edit"></i></button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Load laboratory
+        function loadLaboratory() {
+            const container = document.getElementById('tests-table');
+            if (!container) return;
+            container.innerHTML = '';
+
+            hospitalData.labTests.forEach(test => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-3">${test.patientName}</td>
+                    <td class="p-3">${test.testName}</td>
+                    <td class="p-3">${test.result}</td>
+                    <td class="p-3">${test.date}</td>
+                    <td class="p-3">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-eye"></i></button>
+                        <button class="text-yellow-600 hover:text-yellow-800"><i class="fas fa-edit"></i></button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Load billing
+        function loadBilling() {
+            const container = document.getElementById('invoices-table');
+            if (!container) return;
+            container.innerHTML = '';
+
+            hospitalData.invoices.forEach(invoice => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-3">${invoice.patientName}</td>
+                    <td class="p-3">KES ${invoice.amount.toLocaleString()}</td>
+                    <td class="p-3">
+                        <span class="text-xs px-2 py-1 bg-${invoice.status === 'Paid' ? 'green' : 'red'}-100 text-${invoice.status === 'Paid' ? 'green' : 'red'}-600 rounded-full">${invoice.status}</span>
+                    </td>
+                    <td class="p-3">${invoice.date}</td>
+                    <td class="p-3">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-eye"></i></button>
+                        <button class="text-yellow-600 hover:text-yellow-800"><i class="fas fa-edit"></i></button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Load doctors
+        function loadDoctors() {
+            const container = document.getElementById('doctors-table');
+            if (!container) return;
+            container.innerHTML = '';
+
+            hospitalData.doctors.forEach(doctor => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-3">${doctor.name}</td>
+                    <td class="p-3">${doctor.specialty}</td>
+                    <td class="p-3">${doctor.phone}</td>
+                    <td class="p-3">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-eye"></i></button>
+                        <button class="text-yellow-600 hover:text-yellow-800"><i class="fas fa-edit"></i></button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Load staff
+        function loadStaff() {
+            const container = document.getElementById('staff-table');
+            if (!container) return;
+            container.innerHTML = '';
+
+            hospitalData.staff.forEach(staff => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-3">${staff.name}</td>
+                    <td class="p-3">${staff.role}</td>
+                    <td class="p-3">${staff.phone}</td>
+                    <td class="p-3">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-eye"></i></button>
+                        <button class="text-yellow-600 hover:text-yellow-800"><i class="fas fa-edit"></i></button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Load wards
+        function loadWards() {
+            const container = document.getElementById('wards-table');
+            if (!container) return;
+            container.innerHTML = '';
+
+            hospitalData.wards.forEach(ward => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-3">${ward.name}</td>
+                    <td class="p-3">${ward.totalBeds}</td>
+                    <td class="p-3">${ward.occupiedBeds}</td>
+                    <td class="p-3">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-eye"></i></button>
+                        <button class="text-yellow-600 hover:text-yellow-800"><i class="fas fa-edit"></i></button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Load medical reports
+        function loadMedicalReports() {
+            const container = document.getElementById('reports-table');
+            if (!container) return;
+            container.innerHTML = '';
+
+            hospitalData.medicalReports.forEach(report => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-3">${report.patientName}</td>
+                    <td class="p-3">${report.report}</td>
+                    <td class="p-3">${report.date}</td>
+                    <td class="p-3">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2"><i class="fas fa-eye"></i></button>
+                        <button class="text-yellow-600 hover:text-yellow-800"><i class="fas fa-edit"></i></button>
+                    </td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Save settings
+        function bindSettings() {
+            const saveBtn = document.getElementById('save-settings');
+            if (!saveBtn) return;
+
+            saveBtn.addEventListener('click', () => {
+                hospitalData.settings.hospitalName = document.getElementById('hospital-name').value;
+                hospitalData.settings.location = document.getElementById('hospital-location').value;
+                localStorage.setItem('hospitalData', JSON.stringify(hospitalData));
+                alert('Settings saved successfully');
+            });
+        }
+
+        // Load dashboard data
+        function loadDashboardData() {
+            updateStats();
+            loadRecentPatients();
+            loadTodaysAppointments();
+        }
+
+        // Navigation
+        let currentSection = 'dashboard';
+
+        function navigateTo(section) {
+            currentSection = section;
+            pageTitle.textContent = section.charAt(0).toUpperCase() + section.replace(/-/g, ' ').slice(1);
+            mainContent.innerHTML = sectionTemplates[section]();
+            navLinks.forEach(link => {
+                link.classList.remove('text-white', 'bg-[#664900]');
+                link.classList.add('text-gray-200', 'hover:text-white', 'hover:bg-[#664900]');
+                if (link.dataset.section === section) {
+                    link.classList.add('text-white', 'bg-[#664900]');
+                    link.classList.remove('text-gray-200', 'hover:text-white', 'hover:bg-[#664900]');
+                }
+            });
+
+            // Load section-specific data
+            switch (section) {
+                case 'dashboard': loadDashboardData(); break;
+                case 'patients': loadPatients(); break;
+                case 'appointments': loadAppointments(); break;
+                case 'pharmacy': loadPharmacy(); break;
+                case 'laboratory': loadLaboratory(); break;
+                case 'billing': loadBilling(); break;
+                case 'doctors': loadDoctors(); break;
+                case 'staff': loadStaff(); break;
+                case 'ward-management': loadWards(); break;
+                case 'settings': bindSettings(); break;
+                case 'medical-reports': loadMedicalReports(); break;
+                case 'financial-reports': break; // Data loaded in template
+            }
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = link.dataset.section;
+                navigateTo(section);
+            });
+        });
+
+        // Initialize
+        populateSelects();
+        navigateTo('dashboard');
+    </script>
+</body>
+</html>
